@@ -25,4 +25,4 @@ pnpm-debug.log*
 
 /wp
 
-/cdn/libs/secret_config.json
+/cdn/libs/secret_config.js

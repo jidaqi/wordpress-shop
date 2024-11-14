@@ -8,7 +8,7 @@
 import { S3Client } from "@aws-sdk/client-s3"
 import { CloudFront } from "@aws-sdk/client-cloudfront"
 import AWS from 'aws-sdk'
-import config from './secret_config.json'
+import config from './secret_config.js'
 
 const REGION = process.env.REGION || 'us-east-1'
 const credentials = config
