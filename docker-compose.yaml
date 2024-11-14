@@ -51,6 +51,17 @@ services:
             - ./wp/database:/var/lib/mysql
         networks:
             - default
+    
+    cdn:
+        build: ./cdn
+        volumes:
+            - ./wp/html:/app/data:rw
+        environment:
+            DATA_PATH: /app/data/
+            DISTRIBUTION_ID: E26EZJCNBKX7UK
+            REGION: us-east-1
+            Bucket: wp-cdn-store
+        entrypoint: ["sh", "-c", "node /app/script/index.js"]
 
 networks:
   default:

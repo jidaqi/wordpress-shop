@@ -24,3 +24,5 @@ pnpm-debug.log*
 /.history/
 
 /wp
+
+/cdn/libs/secret_config.json
