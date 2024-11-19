@@ -11,19 +11,8 @@ services:
             - ./nginx/conf/conf.d:/etc/nginx/conf.d:ro
             - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
             - ./nginx/conf/default.conf:/etc/nginx/default.conf:ro
-            - ./certbot/www:/var/www/certbot/:ro
-            - ./certbot/conf/:/etc/nginx/ssl/:ro
         networks:
             - default
-
-    certbot:
-        image: certbot/certbot:latest
-        volumes:
-            - ./certbot/www/:/var/www/certbot/:rw
-            - ./certbot/conf/:/etc/letsencrypt/:rw
-        networks:
-            - default
-
 
     wp:
         image: wordpress:latest
@@ -58,9 +47,9 @@ services:
             - ./wp/html:/app/data:rw
         environment:
             DATA_PATH: /app/data/
-            DISTRIBUTION_ID: E26EZJCNBKX7UK
-            REGION: us-east-1
-            Bucket: wp-cdn-store
+            DISTRIBUTION_ID: E37K55D7AKPX7G
+            REGION: ca-central-1
+            Bucket: wp-cdn-store-ap-southeast
         entrypoint: ["sh", "-c", "node /app/script/index.js"]
 
 networks:

@@ -10,7 +10,7 @@ import { CloudFront } from "@aws-sdk/client-cloudfront"
 import AWS from 'aws-sdk'
 import config from './secret_config.js'
 
-const REGION = process.env.REGION || 'us-east-1'
+const REGION = process.env.REGION
 const credentials = config
 AWS.config.update({ region: REGION })
 
