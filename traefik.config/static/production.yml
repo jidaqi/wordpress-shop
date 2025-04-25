@@ -1,0 +1,22 @@
+certificatesResolvers:
+  le:
+    acme:
+      email: jidaqi888@gmail.com    # 替换为真实邮箱
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+http:
+  middlewares:
+    https-redirect:    # 自动跳转到 HTTPS
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"

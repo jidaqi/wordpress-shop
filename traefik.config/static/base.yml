@@ -1,0 +1,18 @@
+global:
+  checkNewVersion: false
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    exposedByDefault: false
+  file:
+    watch: true
+    directory: "/etc/traefik/config/dynamic"
+
+log:
+  level: INFO

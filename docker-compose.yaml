@@ -1,63 +1,56 @@
-version: '3.8'
-
 services:
-  reverse-proxy:
-    image: traefik:v2.8
-    platform: linux/amd64
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      # 公共入口点配置
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      # 环境相关配置
-      - "${TRAEFIK_CERT_RESOLVER_COMMAND}"
-      - "${TRAEFIK_REDIRECT_MIDDLEWARE_COMMAND}"
-    ports:
-      - "${HTTP_PORT}:80"
-      - "${HTTPS_PORT}:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - traefik-net
-    environment:
-      - TRAEFIK_ENV=${TRAEFIK_ENV:-production}
+    reverse-proxy:
+        image: traefik:v2.8
+        platform: linux/amd64
+        ports:
+            - "${HTTP_PORT:-8080}:80"
+            - "${HTTPS_PORT:-8443}:443"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./traefik.config/static:/etc/traefik/config # 统一配置目录
+            - ./traefik.config/dynamic:/etc/traefik/config/dynamic
+            - .letsencrypt:/letsencrypt # 证书存储
 
-  wp:
-    image: wordpress:latest
-    platform: linux/amd64
-    restart: always
-    environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-    volumes:
-      - ./wp/html:/var/www/html
-    networks:
-      - traefik-net
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.wp.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.wp.entrypoints=${ENTRYPOINTS}"
-      - "traefik.http.routers.wp.middlewares=${MIDDLEWARES}"
-      - "traefik.http.services.wp.loadbalancer.server.port=80"
-      - "traefik.http.routers.wp.tls=${TLS_ENABLED}"
-      - "traefik.http.routers.wp.tls.certresolver=${CERT_RESOLVER}"
+        command:
+            - "--configfile=/etc/traefik/config/base.yml"
+            - "--providers.file.filename=/etc/traefik/config/${TRAEFIK_ENV_CONFIG:-development}.yml"
+            - "--api.insecure=${TRAEFIK_DASHBOARD_ENABLED:-false}"
+        environment:
+            TRAEFIK_ENV: ${ENV:-production}
+        networks:
+            - default
 
-  db:
-    image: mysql:5.7
-    platform: linux/amd64
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: a123456
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-    volumes:
-      - ./wp/database:/var/lib/mysql
-    networks:
-      - traefik-net
+    wp:
+        image: wordpress:latest
+        platform: linux/amd64
+        restart: always
+        environment:
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
+        volumes:
+            - ./wp/html:/var/www/html
+        networks:
+            - default
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.dev-wp.rule=Host(`localhost`) || PathPrefix(`/wp`)"
+            - "traefik.http.routers.dev-wp.entrypoints=web"
+            - "traefik.http.services.dev-wp.loadbalancer.server.port=80"
+
+    db:
+        image: mysql:5.7
+        platform: linux/amd64
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: a123456
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+        volumes:
+            - ./wp/database:/var/lib/mysql
+        networks:
+            - default
 
 #   cdn:
 #     build: ./cdn
@@ -76,8 +69,7 @@ services:
 #       - "traefik.http.routers.cdn.tls.certresolver=le"
 #       - "traefik.http.services.cdn.loadbalancer.server.port=3000"  # 假设你的CDN服务运行在3000端口
 #     networks:
-#       - traefik-net
+#       - default
 
 networks:
-  traefik-net:
-    driver: bridge
+    default:

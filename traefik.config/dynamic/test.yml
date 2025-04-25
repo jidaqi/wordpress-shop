@@ -1,0 +1,12 @@
+http:
+  routers:
+    test:
+      rule: "PathPrefix(`/hello`)"
+      service: test-svc
+      entryPoints:
+        - web
+  services:
+    test-svc:
+      loadBalancer:
+        servers:
+          - url: "http://localhost"

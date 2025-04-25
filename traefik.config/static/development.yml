@@ -1,0 +1,19 @@
+http:
+  routers:
+    fallback:
+      rule: "PathPrefix(`/`)"
+      service: dummy
+      entryPoints:
+        - web
+      priority: 999  # 最低优先级
+    
+  services:
+    dummy:
+      loadBalancer:
+        servers:
+          - url: "http://localhost"  # 无效端点用于占位
+  middlewares:
+    dev-headers:   # 添加开发环境标识
+      headers:
+        customResponseHeaders:
+          X-Environment: "Development"
