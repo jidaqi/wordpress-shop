@@ -17,13 +17,13 @@ services:
         networks:
             - default
 
-    certbot:
-        image: certbot/certbot:latest
-        volumes:
-            - ./certbot/www/:/var/www/certbot/:rw
-            - ./certbot/conf/:/etc/letsencrypt/:rw
-        networks:
-            - default
+    # certbot:
+    #     image: certbot/certbot:latest
+    #     volumes:
+    #         - ./certbot/www/:/var/www/certbot/:rw
+    #         - ./certbot/conf/:/etc/letsencrypt/:rw
+    #     networks:
+    #         - default
 
     certbot-cron:
         image: certbot/certbot:latest
