@@ -3,6 +3,7 @@ version: '3.6'
 services:
     nginx:
         image: nginx:1.15.7-alpine
+        platform: linux/amd64
         restart: always
         ports:
             - "80:80"
@@ -24,9 +25,26 @@ services:
         networks:
             - default
 
+    certbot-cron:
+        image: certbot/certbot:latest
+        container_name: certbot-cron
+        environment:
+            - - TZ=Asia/Shanghai
+        volumes:
+            - ./certbot/www:/var/www/certbot:rw  # 必须RW权限
+            - ./certbot/conf:/etc/letsencrypt:rw  # 证书存储目录
+            - /var/run/docker.sock:/var/run/docker.sock:ro  # 关键点！
+        entrypoint: |
+            sh -c 'echo "0 3 * * * certbot renew --quiet --post-hook \"docker exec nginx nginx -s reload\"" > /etc/crontabs/root &&
+            crond -f'
+        restart: unless-stopped  # 推荐配置
+        networks:
+            - default
+
 
     wp:
         image: wordpress:latest
+        platform: linux/amd64
         restart: always
         # ports:
         #   - 80:80
@@ -41,6 +59,7 @@ services:
 
     db:
         image: mysql:5.7
+        platform: linux/amd64
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: a123456
@@ -52,16 +71,16 @@ services:
         networks:
             - default
     
-    cdn:
-        build: ./cdn
-        volumes:
-            - ./wp/html:/app/data:rw
-        environment:
-            DATA_PATH: /app/data/
-            DISTRIBUTION_ID: E26EZJCNBKX7UK
-            REGION: us-east-1
-            Bucket: wp-cdn-store
-        entrypoint: ["sh", "-c", "node /app/script/index.js"]
+    # cdn:
+    #     build: ./cdn
+    #     volumes:
+    #         - ./wp/html:/app/data:rw
+    #     environment:
+    #         DATA_PATH: /app/data/
+    #         DISTRIBUTION_ID: E26EZJCNBKX7UK
+    #         REGION: us-east-1
+    #         Bucket: wp-cdn-store
+    #     entrypoint: ["sh", "-c", "node /app/script/index.js"]
 
 networks:
   default:
