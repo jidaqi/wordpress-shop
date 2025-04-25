@@ -7,13 +7,13 @@ services:
             - "${HTTPS_PORT:-8443}:443"
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:ro
-            - ./traefik.config/static:/etc/traefik/config # 统一配置目录
+            - ./traefik.config/static:/etc/traefik/config/static # 统一配置目录
             - ./traefik.config/dynamic:/etc/traefik/config/dynamic
             - ./letsencrypt:/letsencrypt # 证书存储
 
         command:
-            - "--configfile=/etc/traefik/config/base.yml"
-            - "--providers.file.filename=/etc/traefik/config/${TRAEFIK_ENV_CONFIG:-development}.yml"
+            - "--configfile=/etc/traefik/config/static/base.yml"
+            - "--providers.file.filename=/etc/traefik/config/static/${TRAEFIK_ENV_CONFIG:-development}.yml"
             - "--api.insecure=${TRAEFIK_DASHBOARD_ENABLED:-false}"
         environment:
             TRAEFIK_ENV: ${ENV:-production}
