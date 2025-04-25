@@ -34,9 +34,13 @@ services:
             - default
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.dev-wp.rule=Host(`localhost`) || PathPrefix(`/wp`)"
-            - "traefik.http.routers.dev-wp.entrypoints=web"
-            - "traefik.http.services.dev-wp.loadbalancer.server.port=80"
+            - "traefik.http.services.wp.loadbalancer.server.port=80"
+
+            - "traefik.http.routers.${ENV}-wp.rule=Host(`${DOMAIN}`) || PathPrefix(`/wp`)"
+            - "traefik.http.routers.${ENV}-wp.entrypoints=${ENTRYPOINTS}"
+            - "traefik.http.routers.${ENV}-wp.tls=${TLS_ENABLED}"
+            - "traefik.http.routers.${ENV}-wp.tls.certresolver=${TRAEFIK_CERT_RESOLVER}"
+            
 
     db:
         image: mysql:5.7
