@@ -1,8 +1,25 @@
+global:
+  checkNewVersion: false
 
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    exposedByDefault: false
+  file:
+    watch: true
+    directory: "/etc/traefik/config/dynamic"
+
+log:
+  level: INFO
 
 http:
   middlewares:
-    https-redirect:    # 自动跳转到 HTTPS
+    https-redirect: # 自动跳转到 HTTPS
       redirectScheme:
         scheme: https
         permanent: true
@@ -14,3 +31,11 @@ tls:
       cipherSuites:
         - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
         - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+
+certificatesResolvers:
+  leresolver:
+    acme:
+      email: jidaqi888@gmail.com # 替换为真实邮箱
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web

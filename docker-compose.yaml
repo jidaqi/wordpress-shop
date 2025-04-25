@@ -12,8 +12,7 @@ services:
             - ./letsencrypt:/letsencrypt # 证书存储
 
         command:
-            - "--configfile=/etc/traefik/config/static/base.yml"
-            - "--providers.file.filename=/etc/traefik/config/static/${TRAEFIK_ENV_CONFIG:-development}.yml"
+            - "--configfile=/etc/traefik/config/static/${TRAEFIK_ENV_CONFIG:-development}.yml"
             - "--api.insecure=${TRAEFIK_DASHBOARD_ENABLED:-false}"
         environment:
             - "TRAEFIK_ENV_CONFIG=${TRAEFIK_ENV_CONFIG:-development}"
