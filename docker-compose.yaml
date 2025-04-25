@@ -9,8 +9,8 @@ services:
       - "--providers.docker.exposedbydefault=false"
       # 公共入口点配置
       - "--entrypoints.web.address=:80"
-      # 环境相关配置
       - "--entrypoints.websecure.address=:443"
+      # 环境相关配置
       - "${TRAEFIK_CERT_RESOLVER_COMMAND}"
       - "${TRAEFIK_REDIRECT_MIDDLEWARE_COMMAND}"
     ports:
