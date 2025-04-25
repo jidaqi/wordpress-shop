@@ -9,7 +9,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:ro
             - ./traefik.config/static:/etc/traefik/config # 统一配置目录
             - ./traefik.config/dynamic:/etc/traefik/config/dynamic
-            - .letsencrypt:/letsencrypt # 证书存储
+            - ./letsencrypt:/letsencrypt # 证书存储
 
         command:
             - "--configfile=/etc/traefik/config/base.yml"
