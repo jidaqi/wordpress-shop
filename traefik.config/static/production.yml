@@ -1,10 +1,4 @@
-certificatesResolvers:
-  leresolver:
-    acme:
-      email: jidaqi888@gmail.com    # 替换为真实邮箱
-      storage: /letsencrypt/acme.json
-      httpChallenge:
-        entryPoint: web
+
 
 http:
   middlewares:
