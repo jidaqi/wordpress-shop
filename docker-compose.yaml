@@ -53,8 +53,8 @@ services:
                 limits:
                     cpus: '0.8'
                     memory: 600M
-            reservations:
-                memory: 300M # 保证基础存活内存
+                reservations:
+                    memory: 300M # 保证基础存活内存
 
     db:
         image: mysql:5.7
