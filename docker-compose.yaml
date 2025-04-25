@@ -13,7 +13,7 @@ services:
 
         command:
             - "--configfile=/etc/traefik/config/static/${TRAEFIK_ENV_CONFIG:-development}.yml"
-            - "--api.insecure=${TRAEFIK_DASHBOARD_ENABLED:-false}"
+            - "--api.dashboard=${TRAEFIK_DASHBOARD_ENABLED:-false}"
         environment:
             - "TRAEFIK_ENV_CONFIG=${TRAEFIK_ENV_CONFIG:-development}"
         networks:
