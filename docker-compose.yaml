@@ -18,6 +18,13 @@ services:
             - "TRAEFIK_ENV_CONFIG=${TRAEFIK_ENV_CONFIG:-development}"
         networks:
             - default
+        # 生产环境性能限制
+        deploy:
+            resources:
+                limits:
+                cpus: '0.1'
+                memory: 128M
+                pids_limit: 50 # 防止进程数爆炸
 
     wp:
         image: wordpress:latest
@@ -39,7 +46,14 @@ services:
             - "traefik.http.routers.${ENV}-wp.entrypoints=${ENTRYPOINTS}"
             - "traefik.http.routers.${ENV}-wp.tls=${TLS_ENABLED}"
             - "traefik.http.routers.${ENV}-wp.tls.certresolver=${TRAEFIK_CERT_RESOLVER}"
-            
+        # 生产环境性能限制
+        deploy:
+            resources:
+                limits:
+                cpus: '0.8'
+                memory: 600M
+            reservations:
+                memory: 300M # 保证基础存活内存
 
     db:
         image: mysql:5.7
@@ -54,6 +68,12 @@ services:
             - ./wp/database:/var/lib/mysql
         networks:
             - default
+        # 生产环境性能限制
+        deploy:
+            resources:
+                limits:
+                memory: 256M
+            command: --innodb-buffer-pool-size=64M # 缩减InnoDB缓存
 
 #   cdn:
 #     build: ./cdn
