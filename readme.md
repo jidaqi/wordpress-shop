@@ -1,3 +1,7 @@
-docker-compose up     # start docker with logs printed to stdout
-docker-compose up -d  # start detached (daemon) to run in the background
-docker-compose down   # shutdown detached docker instances
+# 生产环境（默认）
+cp .env.production .env
+docker compose up -d
+
+# 开发环境
+cp .env.development .env
+docker compose up -d
