@@ -3,6 +3,7 @@ node_modules
 /dist
 
 # local env files
+.env
 .env.local
 .env.*.local
 
@@ -27,4 +28,3 @@ pnpm-debug.log*
 
 /cdn/libs/secret_config.js
 
-.env
