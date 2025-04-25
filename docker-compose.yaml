@@ -23,9 +23,9 @@ services:
         deploy:
             resources:
                 limits:
-                cpus: '0.1'
-                memory: 128M
-                pids_limit: 50 # 防止进程数爆炸
+                    cpus: '0.1'
+                    memory: 128M
+                    pids_limit: 50 # 防止进程数爆炸
 
     wp:
         image: wordpress:latest
@@ -51,8 +51,8 @@ services:
         deploy:
             resources:
                 limits:
-                cpus: '0.8'
-                memory: 600M
+                    cpus: '0.8'
+                    memory: 600M
             reservations:
                 memory: 300M # 保证基础存活内存
 
@@ -73,7 +73,7 @@ services:
         deploy:
             resources:
                 limits:
-                memory: 256M
+                    memory: 256M
             command: --innodb-buffer-pool-size=64M # 缩减InnoDB缓存
 
 #   cdn:
