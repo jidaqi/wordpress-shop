@@ -74,7 +74,8 @@ services:
             resources:
                 limits:
                     memory: 256M
-            command: --innodb-buffer-pool-size=64M # 缩减InnoDB缓存
+            command:
+                - "--innodb-buffer-pool-size=64M" # 缩减InnoDB缓存
 
 #   cdn:
 #     build: ./cdn
