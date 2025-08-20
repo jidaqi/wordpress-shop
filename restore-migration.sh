@@ -1,26 +1,34 @@
 #!/bin/bash
 
 # WordPress Docker 项目迁移恢复脚本
-# 使用方法: ./restore-migration.sh [备份目录名]
+# 使用方法: ./restore-migration.sh
 
 set -e
 
-# 检查参数
-if [ -z "$1" ]; then
-    echo "❌ 请指定备份目录名"
-    echo "使用方法: ./restore-migration.sh wp-backup-YYYYMMDD_HHMMSS"
+echo "🚀 开始恢复 WordPress Docker 项目..."
+
+# 检查当前目录是否为备份目录
+if [ ! -f "wordpress_db.sql" ] || [ ! -d "project" ]; then
+    echo "❌ 当前目录不是备份目录"
+    echo "请确保您在备份目录中运行此脚本"
+    echo "目录应包含: wordpress_db.sql 和 project/ 文件夹"
+    echo ""
+    echo "正确的使用方法："
+    echo "1. cd wp-backup-YYYYMMDD_HHMMSS"
+    echo "2. ./restore-migration.sh"
     exit 1
 fi
 
-BACKUP_DIR="$1"
+BACKUP_DIR=$(basename "$PWD")
 PROJECT_NAME="wordpress-shop"
 
-if [ ! -d "$BACKUP_DIR" ]; then
-    echo "❌ 备份目录不存在: $BACKUP_DIR"
-    exit 1
-fi
+echo "📁 备份目录: $BACKUP_DIR"
+echo "� 备份内容检查..."
 
-echo "🚀 开始恢复 WordPress Docker 项目..."
+# 显示备份内容
+ls -la
+
+echo ""
 
 # 检查 Docker 和 Docker Compose
 if ! command -v docker &> /dev/null; then
@@ -34,8 +42,32 @@ if ! command -v docker-compose &> /dev/null; then
 fi
 
 echo "📁 恢复项目文件..."
-# 复制项目文件到当前目录
-cp -r "$BACKUP_DIR/project/"* ./
+# 检查是否在正确的位置运行
+if [ ! -w "." ]; then
+    echo "❌ 当前目录没有写权限"
+    exit 1
+fi
+
+# 创建项目目录
+TARGET_DIR="../${PROJECT_NAME}"
+if [ -d "$TARGET_DIR" ]; then
+    echo "⚠️  目标目录已存在: $TARGET_DIR"
+    read -p "是否覆盖现有目录？(y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "❌ 用户取消恢复"
+        exit 1
+    fi
+    echo "🗑️  备份现有目录..."
+    mv "$TARGET_DIR" "${TARGET_DIR}.backup.$(date +%Y%m%d_%H%M%S)"
+fi
+
+# 复制项目文件到上级目录
+echo "📂 恢复项目文件到: $TARGET_DIR"
+cp -r project/ "$TARGET_DIR"
+
+# 进入项目目录
+cd "$TARGET_DIR"
 
 # 确保脚本有执行权限
 chmod +x *.sh 2>/dev/null || true
@@ -53,9 +85,9 @@ echo "⏳ 等待数据库启动..."
 sleep 30
 
 # 导入数据库
-if [ -f "$BACKUP_DIR/wordpress_db.sql" ]; then
+if [ -f "../$BACKUP_DIR/wordpress_db.sql" ]; then
     echo "📥 导入 WordPress 数据库..."
-    docker exec -i $(docker-compose ps -q db) mysql -u wordpress -pwordpress wordpress < "$BACKUP_DIR/wordpress_db.sql"
+    docker exec -i $(docker-compose ps -q db) mysql -u wordpress -pwordpress wordpress < "../$BACKUP_DIR/wordpress_db.sql"
 else
     echo "⚠️  未找到数据库备份文件，将使用全新数据库"
 fi
