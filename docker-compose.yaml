@@ -19,13 +19,6 @@ services:
             - "TRAEFIK_ENV_CONFIG=${TRAEFIK_ENV_CONFIG:-development}"
         networks:
             - default
-        # 生产环境性能限制
-        deploy:
-            resources:
-                limits:
-                    cpus: '0.1'
-                    memory: 128M
-                    pids: 50 # 防止进程数爆炸
 
     wp:
         image: wordpress:latest
@@ -47,14 +40,6 @@ services:
             - "traefik.http.routers.${ENV}-wp.entrypoints=${ENTRYPOINTS}"
             - "traefik.http.routers.${ENV}-wp.tls=${TLS_ENABLED}"
             - "traefik.http.routers.${ENV}-wp.tls.certresolver=${TRAEFIK_CERT_RESOLVER}"
-        # 生产环境性能限制
-        deploy:
-            resources:
-                limits:
-                    cpus: '0.8'
-                    memory: 600M
-                reservations:
-                    memory: 300M # 保证基础存活内存
 
     db:
         image: mysql:5.7
@@ -69,32 +54,6 @@ services:
             - ./wp/database:/var/lib/mysql
         networks:
             - default
-        # 生产环境性能限制
-        deploy:
-            resources:
-                limits:
-                    memory: 256M
-        command:
-            - "--innodb-buffer-pool-size=64M" # 缩减InnoDB缓存
-
-#   cdn:
-#     build: ./cdn
-#     volumes:
-#       - ./wp/html:/app/data:rw
-#     environment:
-#       DATA_PATH: /app/data/
-#       DISTRIBUTION_ID: E26EZJCNBKX7UK
-#       REGION: us-east-1
-#       Bucket: wp-cdn-store
-#     entrypoint: ["sh", "-c", "node /app/script/index.js"]
-#     labels:
-#       - "traefik.enable=true"
-#       - "traefik.http.routers.cdn.rule=Host(`cdn.your-domain.com`)"  # CDN子域名（按需修改）
-#       - "traefik.http.routers.cdn.entrypoints=websecure"
-#       - "traefik.http.routers.cdn.tls.certresolver=le"
-#       - "traefik.http.services.cdn.loadbalancer.server.port=3000"  # 假设你的CDN服务运行在3000端口
-#     networks:
-#       - default
 
 networks:
     default:
